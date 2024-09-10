@@ -41,6 +41,9 @@ const results = Object.fromEntries(
         string: date.toString(),
         localeDate: date.toLocaleDateString("en-US"),
         localeTime: date.toLocaleTimeString("en-US"),
+        locale: date.toLocaleString("en-US"),
+        utc: date.toUTCString(),
+        json: date.toJSON(),
       },
     ];
   })

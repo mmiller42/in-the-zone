@@ -124,9 +124,9 @@ export function extractDateValues(target: Date, timezone: string): DateValues {
   ].join(" ");
 
   values.timeString = [
-    zpad(values.hours),
-    zpad(values.minutes),
-    zpad(values.seconds),
+    [values.hours, values.minutes, values.seconds]
+      .map((n) => zpad(n))
+      .join(":"),
     offsetDescription!,
     `(${classicTzName!})`,
   ].join(" ");
@@ -182,7 +182,7 @@ function getOffsetFromLongName(
   }
 
   if (longName === "GMT") {
-    return { value: 0, string: "GMT" };
+    return { value: 0, string: "GMT+0000" };
   }
 
   const match = longName.match(/^GMT([+-])(\d{2}):(\d{2})$/);
@@ -194,7 +194,7 @@ function getOffsetFromLongName(
   const [, offsetSign, offsetH, offsetM] = match;
 
   const value =
-    (Number(offsetH) + 60 * Number(offsetM)) * (offsetSign === "+" ? -1 : 1);
+    (Number(offsetH) * 60 + Number(offsetM)) * (offsetSign === "+" ? -1 : 1);
 
   return { value, string: `GMT${offsetSign}${offsetH}${offsetM}` };
 }
