@@ -26,6 +26,7 @@
     "lint": "eslint",
     "test": "node ./test_data/runner.mjs",
     "build": "tsc",
-    "prepare": "husky"
+    "prepare": "husky",
+    "prepack": "npm run build"
   }
 }
