@@ -5,4 +5,6 @@ module.exports = {
   transform: {
     "^.+.tsx?$": ["ts-jest", {}],
   },
+  modulePathIgnorePatterns: ["<rootDir>/dist"],
+  verbose: false,
 };
