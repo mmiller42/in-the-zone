@@ -1,7 +1,7 @@
 const unboundSym: unique symbol = Symbol();
 
 function isUnbound(target: object): boolean {
-  return target[unboundSym as keyof typeof target] === true;
+  return Reflect.get(target, unboundSym) === true;
 }
 
 export function unbindZonedDate(target: Date): Date {

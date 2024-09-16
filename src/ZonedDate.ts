@@ -1,4 +1,8 @@
-import { BaseZonedDate } from "./BaseZonedDate";
+import {
+  BaseZonedDate,
+  isZonedDateConstructor,
+  ZONED_DATE_TZ_SYMBOL,
+} from "./BaseZonedDate";
 import { ValueExtractor } from "./DateValues";
 import { unbindZonedDate } from "./unbindZonedDate";
 
@@ -9,8 +13,12 @@ export type ZonedDateConstructor<T extends string = string> = ReturnType<
 export function createConstructor<T extends string>(timeZone: T) {
   const extractor = new ValueExtractor(timeZone);
 
-  return class ZonedDate extends BaseZonedDate {
+  class ZonedDate extends BaseZonedDate {
     static getTimeZone(): T {
+      return timeZone;
+    }
+
+    static get [ZONED_DATE_TZ_SYMBOL](): T {
       return timeZone;
     }
 
@@ -219,5 +227,16 @@ export function createConstructor<T extends string>(timeZone: T) {
     ): string {
       return super.toLocaleString(locales, { timeZone, ...options });
     }
-  };
+  }
+
+  Object.defineProperty(ZonedDate, "isZonedDateConstructor", {
+    value: function (target: new (...args: never) => unknown): boolean {
+      return isZonedDateConstructor(target, timeZone);
+    },
+    enumerable: false,
+    writable: false,
+    configurable: false,
+  });
+
+  return ZonedDate;
 }

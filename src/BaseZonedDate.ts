@@ -2,9 +2,26 @@ import { localTimeZone } from "./localTimeZone";
 import { zoned } from "./zoned";
 import { ZonedDateConstructor } from "./ZonedDate";
 
+export const ZONED_DATE_TZ_SYMBOL: unique symbol = Symbol.for(
+  "npm://in-the-zone@2/ZONED_DATE_TZ_SYMBOL"
+);
+
 export class BaseZonedDate extends Date {
+  static [Symbol.hasInstance](target: unknown): boolean {
+    if (target === null || typeof target !== "object") {
+      return false;
+    }
+
+    const proto = Object.getPrototypeOf(target);
+
+    return (
+      typeof proto !== "function" &&
+      this.isZonedDateConstructor(proto.constructor)
+    );
+  }
+
   static isZonedDateConstructor(
-    target: object
+    target: new (...args: never) => unknown
   ): target is ZonedDateConstructor<string> {
     return isZonedDateConstructor(target);
   }
@@ -17,6 +34,12 @@ export class BaseZonedDate extends Date {
     return localTimeZone();
   }
 
+  static getTimeZone(): string {
+    throw new TypeError(
+      "Cannot call BaseZonedDate.getTimeZone() directly, create a class with the zoned() function instead"
+    );
+  }
+
   constructor(time: number) {
     if (new.target === BaseZonedDate) {
       throw new Error(
@@ -27,41 +50,62 @@ export class BaseZonedDate extends Date {
     super(time);
   }
 
-  setFullYear(): never {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  setFullYear(y: number, m?: number, d?: number): never {
     throw new TypeError("Cannot call setFullYear on ZonedDate");
   }
 
-  setMonth(): never {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  setMonth(m: number, d?: number): never {
     throw new TypeError("Cannot call setMonth on ZonedDate");
   }
 
-  setDate(): never {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  setDate(d: number): never {
     throw new TypeError("Cannot call setDate on ZonedDate");
   }
 
-  setHours(): never {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  setHours(h: number, m?: number, s?: number, ms?: number): never {
     throw new TypeError("Cannot call setHours on ZonedDate");
   }
 
-  setMinutes(): never {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  setMinutes(m: number, s?: number, ms?: number): never {
     throw new TypeError("Cannot call setMinutes on ZonedDate");
   }
 
-  setSeconds(): never {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  setSeconds(s: number, ms?: number): never {
     throw new TypeError("Cannot call setSeconds on ZonedDate");
   }
 
-  setMilliseconds(): never {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  setMilliseconds(ms: number): never {
     throw new TypeError("Cannot call setMilliseconds on ZonedDate");
   }
 }
 
-const isProto = Object.prototype.isPrototypeOf.bind(
-  Object.getPrototypeOf(BaseZonedDate)
-);
-
 export function isZonedDateConstructor(
-  target: object
-): target is BaseZonedDate {
-  return isProto(Object.getPrototypeOf(target));
+  target: new (...args: never) => unknown
+): target is ZonedDateConstructor<string>;
+export function isZonedDateConstructor<T extends string | undefined>(
+  target: new (...args: never) => unknown,
+  timeZone: T
+): target is ZonedDateConstructor<T extends undefined ? string : T>;
+export function isZonedDateConstructor<
+  T extends string | undefined = undefined
+>(
+  target: new (...args: never) => unknown,
+  timeZone?: T
+): target is ZonedDateConstructor<T extends undefined ? string : T> {
+  if (typeof target !== "function") {
+    return false;
+  }
+
+  const targetTimeZone = Reflect.get(target, ZONED_DATE_TZ_SYMBOL);
+  return (
+    typeof targetTimeZone === "string" &&
+    (timeZone === undefined || targetTimeZone === timeZone)
+  );
 }

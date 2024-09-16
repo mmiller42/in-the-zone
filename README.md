@@ -115,6 +115,8 @@ isZonedDateConstructor(MountainTime); // true
 isZonedDateConstructor(ArizonaTime); // true
 isZonedDateConstructor(mountainTime); // false
 isZonedDateConstructor(Date); // false
+isZonedDateConstructor(MountainTime, "America/Denver"); // true
+isZonedDateConstructor(MountainTime, "America/Phoenix"); // false
 ```
 
 ### with `date-fns`
@@ -135,7 +137,7 @@ format(new MountainTime(1725961033230), "MM/dd/yyyy"); // '09/10/2024'
 interface BaseZonedDateConstructor extends DateConstructor {
   /**
    * Determines if a given class (not instance) extends BaseZonedDate
-   * @param {object} target Prototype which is potentially a subclass
+   * @param {Function} target Prototype which is potentially a subclass
    * @returns {boolean} True if the class extends BaseZonedDate
    */
   isZonedDateConstructor(
@@ -158,6 +160,14 @@ interface BaseZonedDateConstructor extends DateConstructor {
 
 interface ZonedDateConstructor<T extends string>
   extends BaseZonedDateConstructor {
+  /**
+   * Returns true if a given class (not instance) is or extends this particular
+   * ZonedDate class
+   * @param {Function} target Prototype which is potentially a subclass
+   * @returns {boolean} True if the class extends this time zone's ZonedDate
+   */
+  isZonedDateConstructor(target: object): target is ZonedDateConstructor<T>;
+
   /**
    * Returns the time zone identifier this subclass is bound to
    * @returns {string} The time zone identifier

@@ -23,6 +23,10 @@ describe(`ZonedDate with host in the ${TZ()} time zone`, () => {
         values,
       }))
     )("and casting it to the $timeZone time zone", ({ timeZone, values }) => {
+      it("recycles classes", () => {
+        expect(zoned(timeZone)).toBe(zoned(timeZone));
+      });
+
       it("returns all the correct values", () => {
         const ZonedDate = zoned(timeZone);
         const date = new ZonedDate(Date.parse(dateString));
@@ -52,6 +56,8 @@ describe(`ZonedDate with host in the ${TZ()} time zone`, () => {
 
         expect(date.toUTCString()).toBe(values.utc);
         expect(date.toJSON()).toBe(values.json);
+
+        expect(date.getTimeZone()).toBe(timeZone);
       });
 
       describe.each(
