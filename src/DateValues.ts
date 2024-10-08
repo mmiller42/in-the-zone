@@ -83,17 +83,22 @@ export class ValueExtractor {
           values.day = dayIndices[value] ?? NaN;
           weekdayName = value;
           break;
-        case "hour": {
-          let hours = Number(value);
-          hours = hours === 24 ? 0 : hours;
-          values.hours = hours;
+        case "hour":
+          if (Number.isNaN(values.hours)) {
+            let hours = Number(value);
+            hours = hours === 24 ? 0 : hours;
+            values.hours = hours;
+          }
           break;
-        }
         case "minute":
-          values.minutes = Number(value);
+          if (Number.isNaN(values.minutes)) {
+            values.minutes = Number(value);
+          }
           break;
         case "second":
-          values.seconds = Number(value);
+          if (Number.isNaN(values.seconds)) {
+            values.seconds = Number(value);
+          }
           break;
         case "timeZoneName": {
           const res = getOffsetFromLongName(value);
